@@ -1,0 +1,6 @@
+CREATE TABLE tmp (
+	table_name			VARCHAR(20),
+	table_id			VARCHAR(120),
+	batch_id			BIGINT,
+	CONSTRAINT pk_univocity_tmp PRIMARY KEY (table_name, table_id, batch_id)
+)
