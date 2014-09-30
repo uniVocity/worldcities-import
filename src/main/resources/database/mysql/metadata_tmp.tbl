@@ -1,4 +1,4 @@
-CREATE TABLE tmp (
+CREATE TABLE metadata_tmp (
 	table_name			VARCHAR(20),
 	table_id			VARCHAR(120),
 	batch_id			BIGINT,

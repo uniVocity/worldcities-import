@@ -1,0 +1,11 @@
+CREATE TABLE metadata (
+	source				VARCHAR(20) NOT NULL,
+	source_id			VARCHAR(120) NOT NULL,
+	source_hash			INTEGER,
+	destination			VARCHAR(20) NOT NULL,
+	destination_id		VARCHAR(10) NOT NULL,
+	destination_hash	INTEGER,
+	flag				CHARACTER(1) DEFAULT 'N',
+	batch_id			NUMBER(19, 0) DEFAULT NULL,
+	CONSTRAINT pk_univocity_md PRIMARY KEY (source, destination, source_id, destination_id)
+)

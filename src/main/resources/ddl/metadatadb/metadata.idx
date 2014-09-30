@@ -1,1 +1,0 @@
-CREATE INDEX u_md_dst_idx ON metadata (source, destination, destination_id);

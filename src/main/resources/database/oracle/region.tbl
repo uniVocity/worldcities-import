@@ -1,0 +1,5 @@
+CREATE TABLE region (
+	id 			  INTEGER NOT NULL PRIMARY KEY,
+	country       CHAR(2) NOT NULL,
+	name		  VARCHAR(64) NOT NULL
+)
