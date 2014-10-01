@@ -71,7 +71,9 @@ public abstract class Database {
 		String sequences = scripts.get("sequences.sql");
 		if (tablesCreated && sequences != null) {
 			for (String script : sequences.split("\\n")) {
-				jdbcTemplate.execute(script);
+				if (!script.trim().isEmpty()) {
+					jdbcTemplate.execute(script);
+				}
 			}
 		}
 	}

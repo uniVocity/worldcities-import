@@ -11,7 +11,7 @@ public class DatabaseFactory {
 
 	private static final Map<String, Database> databases;
 	static {
-		databases = new HashMap<String, Database>();
+		databases = new TreeMap<String, Database>();
 
 		registerDatabase(new MySqlDatabase());
 		registerDatabase(new OracleXEDatabase());
@@ -24,6 +24,9 @@ public class DatabaseFactory {
 
 	public static Database getDatabase(String databaseName) {
 		Database database = databases.get(databaseName.toLowerCase());
+		if (database == null) {
+			throw new IllegalArgumentException("Unknown database name: " + databaseName + ". Available databases: " + databases.keySet());
+		}
 		database.initialize();
 		return database;
 	}

@@ -91,7 +91,7 @@ public class MigrateWorldCities extends EtlProcess {
 	}
 
 	public static void main(String... args) {
-		MigrateWorldCities cityImport = new MigrateWorldCities("postgres");
+		MigrateWorldCities cityImport = new MigrateWorldCities("oraclexe");
 		try {
 			//initial load with license: ??
 			//Processed 3170238 rows with 3170238 insertions and 0 updates. Time taken: 192919 ms. Throughput 16000 rows/s rows/s.

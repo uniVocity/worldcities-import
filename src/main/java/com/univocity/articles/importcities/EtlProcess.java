@@ -5,8 +5,6 @@
  ******************************************************************************/
 package com.univocity.articles.importcities;
 
-import java.math.*;
-
 import javax.sql.*;
 
 import com.univocity.api.*;

@@ -28,7 +28,7 @@ public class LoadWorldCities extends EtlProcess {
 	}
 
 	public static void main(String... args) {
-		LoadWorldCities loadCities = new LoadWorldCities("postgres");
+		LoadWorldCities loadCities = new LoadWorldCities("OracleXE");
 		try {
 			//with license:
 			//Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 82136 ms. Throughput 38000 rows/s.

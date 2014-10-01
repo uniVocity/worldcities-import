@@ -30,7 +30,6 @@ class OracleXEDatabase extends Database {
 
 	@Override
 	public void applyDatabaseSpecificConfiguration(JdbcDataStoreConfiguration jdbcDataStoreConfig) {
-
 		jdbcDataStoreConfig.setTransactionIsolationLevel(java.sql.Connection.TRANSACTION_READ_COMMITTED);
 
 		jdbcDataStoreConfig.getEntityConfiguration("region").configureField("id").setGenerated(true);
