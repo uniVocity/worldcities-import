@@ -25,7 +25,7 @@ class HsqlDatabase extends Database {
 	@Override
 	public void applyDatabaseSpecificConfiguration(JdbcDataStoreConfiguration jdbcDataStoreConfig) {
 		/*
-		 * Shuts down HSQLDB after executing the data migration processes. 
+		 * Shuts down HSQLDB after executing the data migration processes.
 		 */
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override

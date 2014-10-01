@@ -9,6 +9,7 @@ import javax.sql.*;
 
 import com.univocity.api.*;
 import com.univocity.api.config.*;
+import com.univocity.api.config.builders.*;
 import com.univocity.api.engine.*;
 import com.univocity.api.entity.custom.*;
 import com.univocity.api.entity.jdbc.*;
@@ -17,7 +18,7 @@ import com.univocity.articles.importcities.databases.*;
 
 /**
  * This abstract class configures and initializes a data integration engine with:
- * 
+ *
  * <ul>
  * 	<li>A data store of name "csv", with the world cities files provided by Maxmind.
  * 		<ul>
@@ -26,7 +27,7 @@ import com.univocity.articles.importcities.databases.*;
  * 		</ul>
  *  </li>
  *  <li>
- *  	A data store of name "database", created using the scripts under src/main/resources/database. 
+ *  	A data store of name "database", created using the scripts under src/main/resources/database.
  *  	The connections to the database are configured in the <i>connection.properties</i> file.
  *  </li>
  *  <li>
@@ -34,13 +35,13 @@ import com.univocity.articles.importcities.databases.*;
  *  </li>
  *  <li>
  *  	An initial batch size of 10,000 rows per batch. Notice this is affected by the license type: batch operations will not be enabled with the free, non-commercial license.
- *  	To obtain a free 30-day trial license, simply execute {@link com.univocity.LicenseRequestWizard} and send the license request to licenses@univocity.com  
+ *  	To obtain a free 30-day trial license, simply execute {@link com.univocity.LicenseRequestWizard} and send the license request to licenses@univocity.com
  *  	More information about licenses <a href="http://www.univocity.com/pages/license-request">here</a>
  *  </li>
  * </ul>
- * 
+ *
  * Subclasses have access to an instance of {@link DataIntegrationEngine} and can define mappings between entities of the "csv" and "database" data stores.
- * 
+ *
  * @author uniVocity Software Pty Ltd - <a href="mailto:dev@univocity.com">dev@univocity.com
  *
  */
@@ -48,7 +49,7 @@ public abstract class EtlProcess {
 
 	private final Database database;
 	private final Database metadataDatabase;
-	
+
 	/**
 	 * An engine properly initialized. Subclasses are expected to use it to configure and execute actual mappings.
 	 */
@@ -98,7 +99,7 @@ public abstract class EtlProcess {
 	/**
 	 * Creates a {@link JdbcDataStoreConfiguration} configuration object with the appropriate settings
 	 * for the underlying database.
-	 * 
+	 *
 	 * @return the configuration for the "database" data store.
 	 */
 	public DataStoreConfiguration createDatabaseConfiguration() {
@@ -107,18 +108,18 @@ public abstract class EtlProcess {
 
 		//Creates a the configuration of a data store named "database", with the given javax.sql.DataSource
 		JdbcDataStoreConfiguration config = new JdbcDataStoreConfiguration("database", dataSource);
-		
+
 		//when reading from tables of this database, never load more than the given number of rows at once.
 		//uniVocity will block any reading process until there's room for more rows.
 		config.setLimitOfRowsLoadedInMemory(batchSize);
-		
+
 		//configures the batch size when inserting/updating/deleting from any table in the database.
 		//By setting the this in defaultEntityConfiguration, all tables will use this batch size.
 		config.getDefaultEntityConfiguration().setBatchSize(batchSize);
-		
+
 		//configures how generated keys should be extracted after insert operations.
 		//Here we are configuring the insert operations to execute in batch, and return all generated keys at once.
-		//Notice that not every JDBC driver suppports that, and you may need to change this configuration to match your specific needs. 
+		//Notice that not every JDBC driver suppports that, and you may need to change this configuration to match your specific needs.
 		config.getDefaultEntityConfiguration().retrieveGeneratedKeysUsingStatement(true);
 
 		//applies any additional configuration that is database-dependent. Refer the implementation under package *com.univocity.articles.importcities.databases*
@@ -130,7 +131,7 @@ public abstract class EtlProcess {
 	/**
 	 * Creates a {@link CsvDataStoreConfiguration} configuration object with the appropriate settings
 	 * to read data from the input files in /src/main/resources/files/
-	 * 
+	 *
 	 * @return the configuration for the "csv" data store.
 	 */
 	public DataStoreConfiguration createFileConfiguration() {
@@ -143,6 +144,16 @@ public abstract class EtlProcess {
 		return csv;
 	}
 
+	/**
+	 * Creates a {@link MetadataSettings} configuration object defining how uniVocity
+	 * should store metadata generated in mappings where {@link PersistenceSetup#usingMetadata()} has been used.
+	 *
+	 * The database configured for metadata storage in /src/main/resources/connection.properties will be used.
+	 *
+	 * This is configuration is option and if not provided uniVocity will create its own in-memory database.
+	 *
+	 * @return the configuration for uniVocity's metadata storage.
+	 */
 	public MetadataSettings createMetadataConfiguration() {
 		MetadataSettings metadata = new MetadataSettings(metadataDatabase.getDataSource());
 		metadata.setMetadataTableName("metadata");
