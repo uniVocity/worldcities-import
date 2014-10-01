@@ -30,8 +30,7 @@ public class MigrateWorldCities extends EtlProcess {
 		cityMapping.reference().using("country", "region").referTo("region_codes", "region").on("region_id").readingWith("toUpperCase").onMismatch().discard();
 
 		cityMapping.value().copy("accentCity").to("name");
-		cityMapping.value().copy("longitude", "latitude").to("longitude", "latitude").readingWith("toBigDecimal");
-		cityMapping.value().copy("population").to("population").readingWith("toInteger");
+		cityMapping.autodetectMappings(); //population, latitude and longitude have the same names on both source and destination
 
 		cityMapping.persistence().usingMetadata().deleteAll().insertNewRows();
 

@@ -22,8 +22,7 @@ public class LoadWorldCities extends EtlProcess {
 		cityMapping.identity().associate("country", "city", "region").to("country", "city_ascii", "region");
 
 		cityMapping.value().copy("accentCity").to("city");
-		cityMapping.value().copy("longitude", "latitude").to("longitude", "latitude").readingWith("toBigDecimal");
-		cityMapping.value().copy("population").to("population").readingWith("toInteger");
+		cityMapping.autodetectMappings(); //population, latitude and longitude have the same names on both source and destination
 
 		cityMapping.persistence().notUsingMetadata().deleteAll().insertNewRows();
 	}

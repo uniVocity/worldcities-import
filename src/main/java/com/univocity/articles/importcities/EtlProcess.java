@@ -53,20 +53,6 @@ public abstract class EtlProcess {
 				return input == null ? null : input.toUpperCase();
 			}
 		});
-
-		engine.addFunction(EngineScope.STATELESS, "toBigDecimal", new FunctionCall<BigDecimal, String>() {
-			@Override
-			public BigDecimal execute(String input) {
-				return input == null ? null : new BigDecimal(input);
-			}
-		});
-
-		engine.addFunction(EngineScope.STATELESS, "toInteger", new FunctionCall<Integer, String>() {
-			@Override
-			public Integer execute(String input) {
-				return input == null ? 0 : Integer.parseInt(input);
-			}
-		});
 	}
 
 	private DataStoreConfiguration createDatabaseConfiguration() {
