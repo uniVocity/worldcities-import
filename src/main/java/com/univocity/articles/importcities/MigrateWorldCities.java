@@ -158,6 +158,7 @@ public class MigrateWorldCities extends EtlProcess {
 	 *  Processed 3170238 rows with 0 insertions and 0 updates. Time taken: 673111 ms. Throughput 4000 rows/s.
 	 *
 	 */
+	@SuppressWarnings("javadoc")
 	public static void main(String... args) {
 		MigrateWorldCities migrateCities = new MigrateWorldCities();
 		try {

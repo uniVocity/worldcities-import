@@ -12,7 +12,11 @@ import com.univocity.*;
  */
 public class RequestLicense {
 
-	public void main(String... args) throws Exception {
+	/**
+	 *  Simply launches the LicenseRequestWizard from the univocity.jar
+	 */
+	@SuppressWarnings("javadoc")
+	public static void main(String... args) throws Exception {
 		LicenseRequestWizard.main(args);
 	}
 }

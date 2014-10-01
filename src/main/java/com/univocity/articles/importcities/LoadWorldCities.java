@@ -65,6 +65,7 @@ public class LoadWorldCities extends EtlProcess {
 	 *
 	 *  Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 565371 ms. Throughput 5614 rows/s.
 	 */
+	@SuppressWarnings("javadoc")
 	public static void main(String... args) {
 		LoadWorldCities loadCities = new LoadWorldCities();
 		try {
