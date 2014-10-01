@@ -25,7 +25,10 @@ public abstract class Database {
 
 	private JdbcTemplate jdbcTemplate;
 
-	Database() {
+	/**
+	 * Just an empty constructor. Initialization happens when {@link #initialize(String, String, String, String)} is invoked.
+	 */
+	public Database() {
 	}
 
 	/**
@@ -58,7 +61,7 @@ public abstract class Database {
 
 	/**
 	 * Returns the driver class name which will be loaded using the old-fashioned {@link Class#forName(String)} method before
-	 * creating a datasource with {@link #createDataSource()}
+	 * creating a datasource.
 	 * @return the driver class name.
 	 */
 	abstract String getDriverClassName();
@@ -68,9 +71,7 @@ public abstract class Database {
 	 * against your database. If required, the tables and sequences necessary to execute the project will
 	 * will be created.
 	 *
-	 * @param isMetadataDatabase flag indicating whether this database will hold metadata information.
-	 * If {@code true} then the metadata tables will be created. If {@code false}, then tables
-	 * worldcities, region and city will be created.
+	 * @param tablesToCreate a sequence of table names to create in this database, if they have not been created yet
 	 */
 	private void initializeDatabase(String tablesToCreate) {
 		File dirWithCreateTableScripts = new File("src/main/resources/database/" + getDatabaseName().toLowerCase());

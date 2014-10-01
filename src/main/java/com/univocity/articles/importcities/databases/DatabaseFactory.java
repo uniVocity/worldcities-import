@@ -30,6 +30,7 @@ public class DatabaseFactory {
 		registerDatabase(MySqlDatabase.class);
 		registerDatabase(OracleXEDatabase.class);
 		registerDatabase(PostgresDatabase.class);
+		registerDatabase(HsqlDatabase.class);
 
 		properties = new Properties();
 		try {
@@ -71,8 +72,6 @@ public class DatabaseFactory {
 
 	/**
 	 * Obtains a {@link Database} instance for the destination database, as specified in the <i>connection.properties</i> file.
-	 *
-	 * @param databaseName the name of the database. Currently supported databases are given by {@link #getAvailableDatabases()}. Names are case-insensitive.
 	 * @return an instance of {@link Database}, properly initialized with the given credentials.
 	 */
 	public Database getDestinationDatabase() {
@@ -81,8 +80,6 @@ public class DatabaseFactory {
 
 	/**
 	 * Obtains a {@link Database} instance for the metadata database, as specified in the <i>connection.properties</i> file.
-	 *
-	 * @param databaseName the name of the database. Currently supported databases are given by {@link #getAvailableDatabases()}. Names are case-insensitive.
 	 * @return an instance of {@link Database}, properly initialized with the given credentials.
 	 */
 	public Database getMetadataDatabase() {
@@ -97,9 +94,6 @@ public class DatabaseFactory {
 	 */
 	private Database newDatabase(String prefix, String tablesToCreate) {
 		String databaseName = properties.getProperty(prefix + ".database.name");
-		if (databaseName == null || databaseName.trim().isEmpty()) {
-			return null;
-		}
 		String connectionUrl = properties.getProperty(prefix + ".database.url");
 		String username = properties.getProperty(prefix + ".database.user");
 		String password = properties.getProperty(prefix + ".database.password");

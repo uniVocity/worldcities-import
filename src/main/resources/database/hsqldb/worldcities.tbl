@@ -1,0 +1,10 @@
+CREATE TABLE worldcities (
+	id 			  IDENTITY PRIMARY KEY,
+    country       CHAR(2),
+    city_ascii    VARCHAR(100),
+    city          VARCHAR(255),
+    region        CHAR(2),
+    population    INTEGER,
+    latitude      DECIMAL(16, 8),
+    longitude     DECIMAL(16, 8)
+)
