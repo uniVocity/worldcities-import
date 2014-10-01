@@ -57,13 +57,13 @@ public class LoadWorldCities extends EtlProcess {
 	 * The time this process takes to complete depends on your hardware and license you are using.
 	 * On my laptop, an Intel i5-3337U @ 1.8 GHz, with 4 GB of RAM and a 128GB SSD drive, running Linux with MySQL, I got:
 	 *
-	 * (a) With an evaluation license, it took a bit more than 1 minute to complete:
+	 * (a) With an evaluation license:
+	 * 	Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 64.094 seconds. Throughput 49520.4 rows/s
 	 *
-	 * 	Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 82136 ms. Throughput 38000 rows/s.
+	 * (b) With no license:
+	 *  Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 8.069 minutes. Throughput 6555.5 rows/s.
 	 *
-	 * (b) With no license, it took around 8 minutes to complete:
-	 *
-	 *  Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 565371 ms. Throughput 5614 rows/s.
+	 *  The process won't need more than 300 MB of RAM to execute, so you probably won't need to provide the Xmx and Xms arguments to the JVM here.
 	 */
 	@SuppressWarnings("javadoc")
 	public static void main(String... args) {

@@ -85,8 +85,8 @@ public class MigrateWorldCities extends EtlProcess {
 			int CITY;
 			int REGION;
 
-			//Let's store all entries in this set
-			Set<String> entries = new HashSet<String>();
+			//Let's store all entries in this set - we know the size of the file so let's just initialize the set with this number.
+			Set<String> entries = new HashSet<String>(3200000);
 			StringBuilder entryBuilder = new StringBuilder();
 
 			@Override
@@ -151,12 +151,17 @@ public class MigrateWorldCities extends EtlProcess {
 	 * The time this process takes to complete depends on your hardware and license you are using.
 	 * On my laptop, an Intel i5-3337U @ 1.8 GHz, with 4 GB of RAM and a 128GB SSD drive, running Linux with MySQL, I got:
 	 *
-	 * (a) With an evaluation license, it took around 3 minutes to complete:
-	 *  Processed 3170238 rows with 3170238 insertions and 0 updates. Time taken: 192919 ms. Throughput 16000 rows/s.
+	 * (a) With an evaluation license:
+	 *  Processed 3170238 rows with 3032002 insertions and 0 updates. Time taken: 61.835 seconds. Throughput 51269.3 rows/s.
 	 *
-	 * (b) With no license, it took around 11 minutes to complete:
-	 *  Processed 3170238 rows with 0 insertions and 0 updates. Time taken: 673111 ms. Throughput 4000 rows/s.
+	 * (b) With no license:
+	 *  Processed 3170238 rows with 3032002 insertions and 0 updates. Time taken: 11.717 minutes. Throughput 4509.3 rows/s.
 	 *
+	 * Please run with the following JVM arguments:
+	 *
+	 * -Xms3G -Xmx3G
+	 *
+	 * We need 3 GB of memory to run this class as we are storing around 3 million entries into a set to eliminate duplicates
 	 */
 	@SuppressWarnings("javadoc")
 	public static void main(String... args) {
