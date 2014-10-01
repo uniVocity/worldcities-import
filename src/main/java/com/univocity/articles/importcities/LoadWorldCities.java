@@ -9,8 +9,8 @@ import com.univocity.api.config.builders.*;
 
 public class LoadWorldCities extends EtlProcess {
 
-	public LoadWorldCities(String database) {
-		super("LoadWorldCities", database);
+	public LoadWorldCities() {
+		super("LoadWorldCities");
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class LoadWorldCities extends EtlProcess {
 	}
 
 	public static void main(String... args) {
-		LoadWorldCities loadCities = new LoadWorldCities("OracleXE");
+		LoadWorldCities loadCities = new LoadWorldCities();
 		try {
 			//with license:
 			//Processed 3173958 rows with 3173958 insertions and 0 updates. Time taken: 82136 ms. Throughput 38000 rows/s.

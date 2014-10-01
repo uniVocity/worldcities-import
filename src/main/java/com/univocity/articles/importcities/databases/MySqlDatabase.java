@@ -5,22 +5,19 @@
  ******************************************************************************/
 package com.univocity.articles.importcities.databases;
 
-import javax.sql.*;
-
-import org.springframework.jdbc.datasource.*;
-
 import com.univocity.api.entity.jdbc.*;
 
+/**
+ * A {@link Database} implementation for MySQL (also works with MariaDB).
+ *
+ * @author uniVocity Software Pty Ltd - <a href="mailto:dev@univocity.com">dev@univocity.com
+ *
+ */
 class MySqlDatabase extends Database {
 
 	@Override
 	public String getDatabaseName() {
 		return "MySql";
-	}
-
-	@Override
-	DataSource createDataSource() {
-		return new SingleConnectionDataSource("jdbc:mysql://localhost:3306/testdb?useServerPrepStmts=false&rewriteBatchedStatements=true", "root", "", true);
 	}
 
 	@Override
@@ -30,6 +27,10 @@ class MySqlDatabase extends Database {
 
 	@Override
 	public void applyDatabaseSpecificConfiguration(JdbcDataStoreConfiguration jdbcDataStoreConfig) {
+		/*
+		 * uniVocity escapes column names that may conflict with database identifiers.
+		 * By default it uses double quotes ("), but in MySQL identifiers are escaped with the backtick character (`).
+		 */
 		jdbcDataStoreConfig.setIdentifierEscaper(new DefaultEscaper("`"));
 	}
 }

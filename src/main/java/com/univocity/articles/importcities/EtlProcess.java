@@ -18,6 +18,7 @@ import com.univocity.articles.importcities.databases.*;
 public abstract class EtlProcess {
 
 	protected final Database database;
+	protected final Database metadataDatabase;
 	protected final DataIntegrationEngine engine;
 
 	protected int batchSize = 10000;
@@ -25,10 +26,11 @@ public abstract class EtlProcess {
 
 	//http://geolite.maxmind.com/download/geoip/misc/region_codes.csv
 	//http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz
-	public EtlProcess(String engineName, String database) {
+	public EtlProcess(String engineName) {
 
 		this.engineName = engineName;
-		this.database = DatabaseFactory.getDatabase(database);
+		this.database = DatabaseFactory.getInstance().getDestinationDatabase();
+		this.metadataDatabase = DatabaseFactory.getInstance().getMetadataDatabase();
 
 		DataStoreConfiguration databaseConfig = createDatabaseConfiguration();
 		DataStoreConfiguration fileConfig = createFileConfiguration();
@@ -53,7 +55,7 @@ public abstract class EtlProcess {
 		});
 	}
 
-	private DataStoreConfiguration createDatabaseConfiguration() {
+	public DataStoreConfiguration createDatabaseConfiguration() {
 		DataSource dataSource = database.getDataSource();
 
 		JdbcDataStoreConfiguration config = new JdbcDataStoreConfiguration("database", dataSource);
@@ -66,7 +68,7 @@ public abstract class EtlProcess {
 		return config;
 	}
 
-	private DataStoreConfiguration createFileConfiguration() {
+	public DataStoreConfiguration createFileConfiguration() {
 		CsvDataStoreConfiguration csv = new CsvDataStoreConfiguration("csv");
 		csv.setLimitOfRowsLoadedInMemory(batchSize);
 		csv.addEntities("files", "ISO-8859-1");
@@ -76,8 +78,11 @@ public abstract class EtlProcess {
 		return csv;
 	}
 
-	private MetadataSettings createMetadataConfiguration() {
-		MetadataSettings metadata = new MetadataSettings(database.getDataSource());
+	public MetadataSettings createMetadataConfiguration() {
+		if (metadataDatabase == null) {
+			return null;
+		}
+		MetadataSettings metadata = new MetadataSettings(metadataDatabase.getDataSource());
 		metadata.setMetadataTableName("metadata");
 		metadata.setTemporaryTableName("metadata_tmp");
 		metadata.setBatchSize(batchSize);
