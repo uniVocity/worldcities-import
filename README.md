@@ -10,7 +10,7 @@ We created two examples for you:
 
  * [LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) - loads the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file into the database table [worldcities](./src/main/resources/database/mysql/worldcities.tbl). 
  
- * [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) - migrates the [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) file to the database table [region](./src/main/resources/database/mysql/region.tbl). We will use uniVocity to manage the keys generated upon insertion of each record, and then migrate data from [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) to the [city](./src/main/resources/database/mysql/city.tbl) table. The  [city](./src/main/resources/database/mysql/city.tbl) table has a foreign key referencing [region](./src/main/resources/database/mysql/region.tbl). In this process we will discard duplicate cities, and cities that are not associated to any region.
+ * [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) - migrates the [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) file to the database table [region](./src/main/resources/database/mysql/region.tbl). We will use uniVocity to manage the keys generated upon insertion of each record, and then migrate data from [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) to the [city](./src/main/resources/database/mysql/city.tbl) table. The  [city](./src/main/resources/database/mysql/city.tbl) table has a foreign key referencing [region](./src/main/resources/database/mysql/region.tbl). In this process we will discard duplicate cities, and cities that are not associated with any region.
 
 ## What to expect
 
@@ -46,7 +46,7 @@ Download the following files from [Maxmind](http://www.maxmind.com):
  * Region codes of all countries in the world: http://geolite.maxmind.com/download/geoip/misc/region_codes.csv
  * All cities in the world:	http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz - this one is a big CSV file with more than 3 million records.
  
-Unzip and place them inside the (src/main/resources/files)[.src/main/resources/files] directory. You should end up with the following structure:
+Unzip and place them inside the [src/main/resources/files](./src/main/resources/files) directory. You should end up with the following structure:
 
 ```
 
@@ -63,15 +63,15 @@ Simply edit the [connection.properties](./src/main/resources/connection.properti
 
 #### If you are using Oracle XE:
 
-Please download the JDBC drivers (`odjbc6.jar`) manually from [Oracle's website](http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html) and add it to your classpath manually.
+Please download the JDBC drivers (`odjbc6.jar`) from [Oracle's website](http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html) and add it to your classpath manually.
 
 To ensure almost everyone is able to execute this project, we made it compatible with the JDK 6. If you are still using the JDK 6, ensure you are downloading the compatible version of the JDBC driver.
 
-You may also need to configure the database itself to allow bigger batch sizes, or increase the number of open cursors. 
+You may also want to configure the database itself to allow bigger batch sizes, and increase the number of open cursors. 
 
 ## Executing the processes 
 
-Just execute [LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) or [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) as a java program. The process will try to connect to your database and create the required tables if they are not present, and then the process will start.
+Just execute [LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) or [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) as a java program. The process will try to connect to your database and create the required tables if they are not present, and then ETL process will start.
 
 If this is the first time you execute uniVocity, a pop-up will will be displayed asking if you agree with the uniVocity free license terms and conditions. Once you agree it will disappear and the process will start normally. Keep in mind that with the free license, batching is disabled.
 
@@ -81,9 +81,9 @@ The [EtlProcess class] (./src/main/java/com/univocity/articles/importcities/EtlP
 
 ### A brief introduction
 
-uniVocity works with abstractions called *data stores* and *data entities*. A *data entity* is an abstraction over anything that is able to store and/or retrieve data, and a *data store* is used to access and manage of data entities. This allows us to use virtually anything as sources and destinations of data. In this example we will use uniVociy to simply extracts data from one or more source data entities (the world cities files) and map the information to destination data entities (a few database tables).
+uniVocity works with abstractions called *data stores* and *data entities*. A *data entity* is an abstraction over anything that is able to store and/or retrieve data, and a *data store* is used to access and manage of data entities. This allows us to use virtually anything as sources and destinations of data. In this example we will use uniVociy to simply extract data from one or more source data entities (the world cities files) and map the information to destination data entities (a few database tables).
 
-In general, the first thing you need to do to use uniVocity is to configure the a few data stores.
+In general, the first thing you need to do to use uniVocity is to configure a few data stores.
 
 ### Configuring the CSV data store.
 
@@ -99,11 +99,11 @@ regionCodesConfig.setHeaders("country", "region_code", "region_name");
 regionCodesConfig.setHeaderExtractionEnabled(false);
 ```
 
-In this snippet, `new CsvDataStoreConfiguration("csv");` creates a CSV data store with name "csv". `setLimitOfRowsLoadedInMemory(batchSize)` limits the number of rows loaded in memory by uniVocity at any given time. uniVocity will wait if the rows loaded during a data mapping cycle are taking too long to be consumed.
+In this snippet, `new CsvDataStoreConfiguration("csv")` creates a CSV data store with name "csv". `setLimitOfRowsLoadedInMemory(batchSize)` limits the number of rows loaded in memory by uniVocity at any given time. uniVocity will wait if the rows loaded during a data mapping cycle are taking too long to be consumed.
 
-The `csv.addEntities("files", "ISO-8859-1");` adds all files under the [src/main/resources/files](./src/main/resources/files) to this data store, and will read them with using the `ISO-8859-1` encoding.
+`csv.addEntities("files", "ISO-8859-1")` adds all files under the [src/main/resources/files](./src/main/resources/files) to this data store, and will read them with using the `ISO-8859-1` encoding.
 
-As the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) has a header row to identify what data is in each column, no configuration is required. uniVocity will detect the available fields automatically.
+As the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) has a header row to identify each column, no configuration is required. uniVocity will detect the available fields automatically.
 
 However, the [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) does not have a header row so we need to provide this information manually. `csv.getEntityConfiguration("region_codes");` will return a configuration object for the `region_code` entity, which is used to provide the headers of the file. We also
 disable header extraction by invoking `setHeaderExtractionEnabled(false)`. This way uniVocity won't consider the first row in the input file as the header row.
@@ -130,7 +130,7 @@ With a datasource ready, a JDBC data store configuration can be created with `ne
 
 Using the `getDefaultEntityConfiguration()` method, we can define default configurations for all entities (in this case tables) in the "database" data store. `setBatchSize(batchSize)` defines the size of bulk insert/update/delete operations over all tables in this data store.
 
-`retrieveGeneratedKeysUsingStatement(true)` configures how generated keys should be extract upon insertion of new rows into any table of this database. In this case generated keys will be retrieved from the `java.sql.Statement` used to insert. The `true` flag indicates that the insert operations can be batched and the JDBC driver supports returning all generated keys after a batch operation. Some JDBC drivers do not support this and in this case batch insertion must be disabled. To circumvent this limitation, we implemented some strategies to allow insertions in batch with retrieval of generated keys in the [JdbcEntityConfiguration](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/entity/jdbc/JdbcEntityConfiguration.java) class.
+`retrieveGeneratedKeysUsingStatement(true)` configures how generated keys should be extracted upon insertion of new rows into any table of this database. In this case generated keys will be retrieved from the `java.sql.Statement` used to insert data. The `true` flag indicates that the insert operations can be batched and the JDBC driver supports returning all generated keys after a batch operation. Some JDBC drivers do not support this and in this case batch insertion must be disabled. To circumvent this limitation, we implemented some strategies to allow insertions in batch with retrieval of generated keys in the [JdbcEntityConfiguration](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/entity/jdbc/JdbcEntityConfiguration.java) class.
 
 Finally, any other database-specific configuration is applied by the underlying implementation of  [Database](./src/main/java/com/univocity/articles/importcities/databases/Database.java).
 Refer to the implementation of each specific database [here](./src/main/java/com/univocity/articles/importcities/databases) to learn more.
@@ -157,14 +157,14 @@ Once the engine has been registered, you can get an instance of [DataIntegration
 engine = Univocity.getEngine(engineName);
 ``` 
 
-And you are ready to define/modify data mappings among entities of your data stores and execute data mapping cycles!
+You are now ready to define/modify data mappings among entities of your data stores and execute data mapping cycles!
 
 
 #### Configuring how metadata is stored (optional)
 
-To perform operations such as data change autodetection (not demonstrated here) and reference mappings (used in [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)), uniVocity generates metadata for each record persisted. You can define where this metadata must be stored or simply use uniVocity with its in-memory metadata database, which is created automatically. If you want to use a database to store metadata, ensure it is tuned to allow fast insert operations.
+To perform operations such as data change autodetection (not demonstrated here) and reference mappings (used in [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)), uniVocity generates metadata for each record persisted. You can define where this metadata should be stored or simply use uniVocity with its in-memory metadata database, which is created automatically. If you want to use your database to store metadata, ensure it is tuned to allow fast insert operations.
 
-To configure the metadata storage, create a [MetadataSettings](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/MetadataSettings.java) object with the `javax.sql.DataSource` for the database.
+To configure the metadata storage, create a [MetadataSettings](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/MetadataSettings.java) object with the `javax.sql.DataSource` that provides connections to your database.
 
 ```java
 MetadataSettings metadata = new MetadataSettings(metadataDatabase.getDataSource());
@@ -182,31 +182,36 @@ The [LoadWorldCities] (./src/main/java/com/univocity/articles/importcities/LoadW
 
 ```java
 DataStoreMapping mapping = engine.map("csv", "database");
-
-//Creates a mapping between the entities available in the data stores: worldcitiespop (from "csv") and worldcities (from "database")
 EntityMapping cityMapping = mapping.map("worldcitiespop", "worldcities");
-
-//All mappings require an identity. The worldcitiespop file does not have a single field that works as an identity, so we define
-//a composite identity. In the destination, the worldcities table has an "ID" column, but in this process we are not interested
-//in doing anything with it. We just give the column names to where values should be copied.
 cityMapping.identity().associate("country", "city", "region").to("country", "city_ascii", "region");
-
-//copies the value from "accentCitity" (in the csv file) to "city" (in the database table)
 cityMapping.value().copy("accentCity").to("city");
-
-//population, latitude and longitude have the same names on both source and destination
 cityMapping.autodetectMappings();
-
-//As we are just loading the worldcities table, no metadata is required. We can just delete all rows (if any) and insert all rows from the file.
 cityMapping.persistence().notUsingMetadata().deleteAll().insertNewRows();
 ```
 
 Using the [DataIntegrationEngine](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/engine/DataIntegrationEngine.java) initialized by the parent class
-[EtlProcess] (./src/main/java/com/univocity/articles/importcities/EtlProcess.java), we start by creating a mapping between the 2 datastores configured previously: `engine.map("csv", "database")` will create a  [DataStoreMapping](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/builders/DataStoreMapping.java), which will be used to create mappings between their data entities.
+[EtlProcess] (./src/main/java/com/univocity/articles/importcities/EtlProcess.java), we create mapping between the 2 datastores configured previously: `engine.map("csv", "database")` will create a  [DataStoreMapping](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/builders/DataStoreMapping.java), which will be used to define mappings between their data entities.
 
-`map("worldcitiespop", "worldcities")` will create an [EntityMapping](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/builders/EntityMapping.java) object which will be used to associate fields of the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file to the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) database table.
+`map("worldcitiespop", "worldcities")` will create an [EntityMapping](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/builders/EntityMapping.java) object which will be used to associate fields of the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file with columns of the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) database table.
 
-All we have to do now is to associate fields in the source to the fields in the destination. uniVocity requires an identity mapping (...to be continued)
+All we have to do now is to associate fields in the source with the fields in the destination. uniVocity requires you to elect a combination of one or more fields as the identifiers of each record in the entity. This is done with the command `identity().associate("country", "city", "region").to("country", "city_ascii", "region")`. Unless other entity mappings have references to the values mapped here, the uniqueness of the identifier values are not essential. The list of fields inside the `associate` method selects the columns in the 
+[worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file, while the list of fields inside the `to` method selects the fields of the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) table.
 
+`value().copy("accentCity").to("city")` creates a value mapping, which will simply copy the values in the `accentCity` column of our CSV file to `city` in the database table.
+
+As the fields `population`, `latitude` and `longitude` have the same names on both source and destination entities, we can simply call `autodetectMappings()`.
+
+The last line in the snippet defines how the data should be persisted in the destination: `persistence().notUsingMetadata().deleteAll().insertNewRows()` configures the entity mapping to not generated any metadata (as we won't use it for anything useful), to delete all rows in the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) table and to insert the new rows mapped from the source entity.
+
+Finally, we can execute a mapping cycle. This is done in the main method of the [LoadWorldCities] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) class 
+
+```java
+LoadWorldCities loadCities = new LoadWorldCities();
+try {
+	loadCities.execute();
+} finally {
+	loadCities.shutdown();
+}
+```  
 
 ## Migrating data with [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)  
