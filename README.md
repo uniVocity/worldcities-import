@@ -194,14 +194,13 @@ Using the [DataIntegrationEngine](http://github.com/uniVocity/univocity-api/blob
 
 `map("worldcitiespop", "worldcities")` will create an [EntityMapping](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/config/builders/EntityMapping.java) object which will be used to associate fields of the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file with columns of the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) database table.
 
-All we have to do now is to associate fields in the source with the fields in the destination. uniVocity requires you to elect a combination of one or more fields as the identifiers of each record in the entity. This is done with the command `identity().associate("country", "city", "region").to("country", "city_ascii", "region")`. Unless other entity mappings have references to the values mapped here, the uniqueness of the identifier values are not essential. The list of fields inside the `associate` method selects the columns in the 
-[worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file, while the list of fields inside the `to` method selects the fields of the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) table.
+All we have to do now is to associate fields in the source with the fields in the destination. uniVocity requires you to elect a combination of one or more fields as the identifiers of each record of both entities. This is done with the command `identity().associate("country", "city", "region").to("country", "city_ascii", "region")`. Unless other entity mappings have references to the values mapped here, the uniqueness of the identifier values is not essential. The list of fields inside the `associate` method selects the columns in the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file, while the list of fields inside the `to` method selects the fields of the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) table. Altough unusal, the identity of a mapping does not need to involve the primary keys of a database table.
 
-`value().copy("accentCity").to("city")` creates a value mapping, which will simply copy the values in the `accentCity` column of our CSV file to `city` in the database table.
+`value().copy("accentCity").to("city")` creates a value mapping, which will simply copy the values in the `accentCity` column of our CSV file to the column `city` of our database table.
 
 As the fields `population`, `latitude` and `longitude` have the same names on both source and destination entities, we can simply call `autodetectMappings()`.
 
-The last line in the snippet defines how the data should be persisted in the destination: `persistence().notUsingMetadata().deleteAll().insertNewRows()` configures the entity mapping to not generated any metadata (as we won't use it for anything useful), to delete all rows in the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) table and to insert the new rows mapped from the source entity.
+The last line in the snippet defines how the data should be persisted in the destination: `persistence().notUsingMetadata().deleteAll().insertNewRows()` configures the entity mapping to not generate any metadata (as we won't use it for anything useful in this example), to delete all rows in the [WorldCities] (./src/main/resources/database/mysql/worldcities.tbl) table and to insert the new rows mapped from the source entity.
 
 Finally, we can execute a mapping cycle. This is done in the main method of the [LoadWorldCities] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) class 
 
@@ -214,4 +213,127 @@ try {
 }
 ```  
 
-## Migrating data with [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)  
+## Migrating data with [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)
+
+The [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) is a bit more involved than the [LoadWorldCities] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) class as we are mapping the information to a new schema, eliminating duplicate/invalid records and processing foreign keys. 
+
+We start by adding a function to the engine to convert some String values to upppercase, as the character case of region and country codes is not consistent in our input files:
+
+```java
+engine.addFunction(EngineScope.STATELESS, "toUpperCase", new FunctionCall<String, String>() {
+	@Override
+	public String execute(String input) {
+		return input == null ? null : input.toUpperCase();
+	}
+});
+``` 
+You can use functions to perform all sorts of powerful operations, refer to the [FunctionCall javadoc](http://docs.univocity.com/api/1.0.2/com/univocity/api/engine/FunctionCall.html) for more information.
+
+Getting back to our mappings, we start by creating a mapping from the CSV entity [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) to the database table 
+[region](./src/main/resources/database/mysql/region.tbl).
+
+```java
+EntityMapping regionMapping = mapping.map("region_codes", "region");
+regionMapping.identity().associate("country", "region_code").toGeneratedId("id").readingWith("toUpperCase");
+regionMapping.value().copy("country", "region_name").to("country", "name");
+regionMapping.persistence().usingMetadata().deleteAll().insertNewRows();
+```  
+The identity mapping will associate the combination of values (converted to uppercase) from `country` and `region_code` in the source CSV with the generated primary key `id` of the 
+[region](./src/main/resources/database/mysql/region.tbl) table.
+
+With `value().copy("country", "region_name").to("country", "name")` we will copy the `country` and `region_name` from the CSV to the table columns `country` and `name` respectively. 
+
+Finally, the `persistence().usingMetadata().deleteAll().insertNewRows();` instructs uniVocity to generate metadata for this entity mapping. This means that it will create some information for each mapped record that enables features such as identification of modified data in the source entity, and reference mappings. In this example we are interested in the reference mappings only, as can be seen in the next entity mapping:
+
+```java
+EntityMapping cityMapping = mapping.map("worldcitiespop", "city");
+cityMapping.identity().associate("country", "city", "region").toGeneratedId("id");
+
+cityMapping.reference().using("country", "region").referTo("region_codes", "region").on("region_id").readingWith("toUpperCase").onMismatch().discard();
+
+cityMapping.value().copy("accentCity").to("name");
+cityMapping.autodetectMappings();
+cityMapping.persistence().notUsingMetadata().deleteAll().insertNewRows();
+``` 
+
+Here we map all cities in the [worldcitiespop](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file into the database table [city](./src/main/resources/database/mysql/city.tbl).
+
+The reference mapping `reference().using("country", "region").referTo("region_codes", "region").on("region_id").readingWith("toUpperCase")` states that: with the values from fields `country` and `region` in the worldcitiespop CSV (converted to uppercase), query the metadata of the entity mapping from `region_codes` to `region`, to find the identifiers generated for the combination of country and region codes, and copy that identifier to the `region_id` column of the database table [city](./src/main/resources/database/mysql/city.tbl). This mapping will generate correct foreign keys, and uniVocity ensures the data is consistent. 
+
+Still on the reference mapping, `onMismatch().discard()` instructs uniVocity to discard any rows from the worldcitiespop CSV that do not have a correct association to a region (the file contains regions with null/inexistent region codes);
+
+Again, we use `autodetectMappings()` to automatically generate mappings to copy values from fields whose names are the same in both entity and destination.
+
+With `persistence().notUsingMetadata().deleteAll().insertNewRows()` we indicate that no metadata is to be generated for this mapping. We just want to delete all rows in the  [city](./src/main/resources/database/mysql/city.tbl) table and insert the data mapped from worldcitiespop.
+
+The last step in this mapping definition is to attach a [RowReader](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/engine/RowReader.java) to the input of this mapping. It will collect the values from [worldcitiespop](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) fields `country`, `city` and `region`, and discard any input row with duplicate or missing data:
+
+```java
+...
+@Override
+public void initialize(RowMappingContext context) {
+	//before processing the first row, we have a chance to get the indexes of each
+	//input field we are interesed in
+	COUNTRY = context.getInputIndex("country");
+	CITY = context.getInputIndex("city");
+	REGION = context.getInputIndex("region");
+}
+
+@Override
+public void processRow(Object[] inputRow, Object[] outputRow, RowMappingContext context) {
+	//let's create an entry with the input data
+	String entry = createEntry(inputRow);
+
+	//if the entry is not null, we check whether it has been processed already
+	if (entry != null) {
+		if (entries.contains(entry)) {
+			//if it has, then we discard the row
+			context.discardRow();
+		} else {
+			//if it hasn't then we store the entry so any other duplicate entry will be discarded
+			entries.add(entry);
+		}
+	} else {
+		//if the information in the row is incomplete, we discard the row.
+		context.discardRow();
+	}
+}
+
+private String createEntry(Object[] inputRow) {
+	//Let's get the values of the elements we are interested in
+	String country = (String) inputRow[COUNTRY];
+	String city = (String) inputRow[CITY];
+	String region = (String) inputRow[REGION];
+
+	//If any of this information is null, then the row will be discarded
+	if (country == null || city == null || region == null) {
+		return null;
+	}
+
+	entryBuilder.setLength(0);
+	entryBuilder.append(country).append('|');
+	entryBuilder.append(city).append('|');
+	entryBuilder.append(region);
+
+	return entryBuilder.toString().toLowerCase();
+}
+...
+```
+
+Finally, we can execute a mapping cycle from the main method of [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)
+Remember to set the JVM args to execute with 3 gigabytes of memory (i.e. `-Xms3G -Xmx3G`), as the  [RowReader](http://github.com/uniVocity/univocity-api/blob/master/src/main/java/com/univocity/api/engine/RowReader.java) stores more than 3 million entries into a hashset to identify and eliminate duplicates.
+
+```java 
+MigrateWorldCities migrateCities = new MigrateWorldCities();
+try {
+	migrateCities.execute();
+} finally {
+	migrateCities.shutdown();
+}
+```
+
+## And that's it
+
+We hope you enjoyed this tutorial. It probably took more time to explain it than to actually write the code. We work very hard to make **[uniVocity](http://www.univocity.com/pages/about-univocity)** your framework of choice to implement all sorts of ETL tools, data mapping, data integration and data synchronizaion solutions. 
+
+#### If you have any questions and suggestions don't hesitate to [e-mail us](mailto:dev@univocity.com) 
