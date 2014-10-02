@@ -68,7 +68,7 @@ public abstract class Database {
 
 	/**
 	 * Iterates over all scripts under {@code src/main/resources/database/*database_name*} and executes them
-	 * against your database. If required, the tables and sequences necessary to execute the project will
+	 * against your database. If required, the tables and other scripts necessary to execute the project will
 	 * will be created.
 	 *
 	 * @param tablesToCreate a sequence of table names to create in this database, if they have not been created yet
@@ -83,7 +83,7 @@ public abstract class Database {
 		}
 
 		if (createTables(tablesToCreate, scripts)) {
-			createSequences(scripts);
+			executeScripts(scripts);
 		}
 	}
 
@@ -110,13 +110,13 @@ public abstract class Database {
 	}
 
 	/**
-	 * Creates sequences and triggers if required. This script is optional and
-	 * it should be under a file named "sequences.sql". Each line in this file will be executed individually
+	 * Executes scripts (usually to create sequences and triggers if required). This script is optional and
+	 * it should be under a file named "scripts.sql". Each line in this file will be executed individually
 	 * against the your database.
 	 * @param scripts a map with script file names and their contents to be executed against your database.
 	 */
-	private void createSequences(Map<String, String> scripts) {
-		String sequences = scripts.get("sequences.sql");
+	private void executeScripts(Map<String, String> scripts) {
+		String sequences = scripts.get("scripts");
 		if (sequences != null) {
 			for (String script : sequences.split("\\n")) {
 				if (!script.trim().isEmpty()) {
