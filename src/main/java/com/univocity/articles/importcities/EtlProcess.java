@@ -80,20 +80,7 @@ public abstract class EtlProcess {
 		Univocity.registerEngine(config);
 		engine = Univocity.getEngine(engineName);
 
-		addFunctions();
 		configureMappings();
-	}
-
-	/**
-	 * Adds functions to the engine, which are accessible to any mappings created by subclasses.
-	 */
-	private void addFunctions() {
-		engine.addFunction(EngineScope.STATELESS, "toUpperCase", new FunctionCall<String, String>() {
-			@Override
-			public String execute(String input) {
-				return input == null ? null : input.toUpperCase();
-			}
-		});
 	}
 
 	/**
@@ -113,14 +100,17 @@ public abstract class EtlProcess {
 		//uniVocity will block any reading process until there's room for more rows.
 		config.setLimitOfRowsLoadedInMemory(batchSize);
 
+		//By setting configuration options using the defaultEntityConfiguration, all tables will be configured to use
+		//these settings by default, unless you explicitly provide alternative configurations for each one.		
+		JdbcEntityConfiguration defaultConfig = config.getDefaultEntityConfiguration();
+		
 		//configures the batch size when inserting/updating/deleting from any table in the database.
-		//By setting the this in defaultEntityConfiguration, all tables will use this batch size.
-		config.getDefaultEntityConfiguration().setBatchSize(batchSize);
+		defaultConfig.setBatchSize(batchSize);
 
 		//configures how generated keys should be extracted after insert operations.
 		//Here we are configuring the insert operations to execute in batch, and return all generated keys at once.
 		//Notice that not every JDBC driver suppports that, and you may need to change this configuration to match your specific needs.
-		config.getDefaultEntityConfiguration().retrieveGeneratedKeysUsingStatement(true);
+		defaultConfig.retrieveGeneratedKeysUsingStatement(true);
 
 		//applies any additional configuration that is database-dependent. Refer the implementation under package *com.univocity.articles.importcities.databases*
 		database.applyDatabaseSpecificConfiguration(config);
@@ -139,8 +129,9 @@ public abstract class EtlProcess {
 		csv.setLimitOfRowsLoadedInMemory(batchSize);
 		csv.addEntities("files", "ISO-8859-1");
 
-		csv.getEntityConfiguration("region_codes").setHeaders("country", "region_code", "region_name");
-		csv.getEntityConfiguration("region_codes").setHeaderExtractionEnabled(false);
+		CsvEntityConfiguration regionCodesConfig = csv.getEntityConfiguration("region_codes");
+		regionCodesConfig.setHeaders("country", "region_code", "region_name");
+		regionCodesConfig.setHeaderExtractionEnabled(false);
 		return csv;
 	}
 
@@ -180,7 +171,8 @@ public abstract class EtlProcess {
 	}
 
 	/**
-	 * Subclasses have access to the {@link #engine} object
+	 * Subclasses have access to the {@link #engine} object, which they should use to configure
+	 * mappings from source to destination.
 	 */
 	protected abstract void configureMappings();
 }

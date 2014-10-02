@@ -35,8 +35,23 @@ public class MigrateWorldCities extends EtlProcess {
 		super("MigrateCities");
 	}
 
+	/**
+	 * Adds functions to the engine, which are accessible to any mappings created by subclasses.
+	 */
+	private void addFunctions() {
+		engine.addFunction(EngineScope.STATELESS, "toUpperCase", new FunctionCall<String, String>() {
+			@Override
+			public String execute(String input) {
+				return input == null ? null : input.toUpperCase();
+			}
+		});
+	}
+
+	
 	@Override
 	protected void configureMappings() {
+		addFunctions();
+		
 		//Creates a mapping between data stores "csv" and "database"
 		DataStoreMapping mapping = engine.map("csv", "database");
 
