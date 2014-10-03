@@ -57,7 +57,7 @@ Unzip and place them inside the [src/main/resources/files](./src/main/resources/
  
 ### Database setup.
 
-We created scripts to generate the required tables for you in the database of your preference. This project includes scripts for [HSQLDB](./src/main/resources/database/hsqldb), [MySQL](./src/main/resources/database/mysql), [Oracle XE](./src/main/resources/database/oraclexe) and [Postgres](./src/main/resources/database/postgres). You can use any other database if you want, just follow [these instructions](./ADD_DB.md) (feel free to submit a pull request with additional scripts your database).
+We created scripts to generate the required tables for you in the database of your preference. This project includes scripts for [HSQLDB](./src/main/resources/database/hsqldb), [MySQL](./src/main/resources/database/mysql), [Oracle XE](./src/main/resources/database/oraclexe), [Microsoft SQL Server](./src/main/resources/database/sqlserver) and [Postgres](./src/main/resources/database/postgres). You can use any other database if you want, just follow [these instructions](./ADD_DB.md) (feel free to submit a pull request with additional scripts your database).
 
 Simply edit the [connection.properties](./src/main/resources/connection.properties) file with the connection details for your database of choice.
 
@@ -68,6 +68,12 @@ Please download the JDBC drivers (`odjbc6.jar`) from [Oracle's website](http://w
 To ensure almost everyone is able to execute this project, we made it compatible with the JDK 6. If you are still using the JDK 6, ensure you are downloading the compatible version of the JDBC driver.
 
 You may also want to configure the database itself to allow bigger batch sizes, and increase the number of open cursors. 
+
+#### If you are using Microsoft SQL Server:
+
+Please download the JDBC drivers (`sqljdbc4.jar`) from [Microsft's website](http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=11774) and add it to your classpath manually.
+
+Additionally, add the `sqljdbc_auth.dll` file that comes with the JDBC driver package to the project root. 
 
 ## Executing the processes 
 

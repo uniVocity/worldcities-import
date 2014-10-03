@@ -1,0 +1,9 @@
+CREATE TABLE city (
+	id 			  INTEGER IDENTITY(1,1)PRIMARY KEY CLUSTERED,
+	region_id	  INTEGER,
+    name          VARCHAR(255) NOT NULL,
+    population    INTEGER,
+    latitude      DECIMAL(16, 8),
+    longitude     DECIMAL(16, 8),
+    CONSTRAINT fk_city_region FOREIGN KEY (region_id) REFERENCES region(id)
+)

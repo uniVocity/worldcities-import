@@ -31,6 +31,7 @@ public class DatabaseFactory {
 		registerDatabase(OracleXEDatabase.class);
 		registerDatabase(PostgresDatabase.class);
 		registerDatabase(HsqlDatabase.class);
+		registerDatabase(SqlServerDatabase.class);
 
 		properties = new Properties();
 		try {
