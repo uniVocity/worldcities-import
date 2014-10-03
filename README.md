@@ -1,4 +1,4 @@
-# World Cities Import
+# Import world cities using uniVocity
 
 This simple project was created to demonstrate how **[uniVocity](http://www.univocity.com/pages/about-univocity)** can be used to load/transform massive amounts of data, and how it performs.
 
@@ -233,7 +233,7 @@ engine.addFunction(EngineScope.STATELESS, "toUpperCase", new FunctionCall<String
 	}
 });
 ``` 
-You can use functions to perform all sorts of powerful operations, refer to the [FunctionCall javadoc](http://docs.univocity.com/api/1.0.2/com/univocity/api/engine/FunctionCall.html) for more information.
+You can use functions to perform all sorts of powerful operations, refer to the [FunctionCall javadoc](http://docs.univocity.com/api/1.0.3/com/univocity/api/engine/FunctionCall.html) for more information.
 
 Getting back to our mappings, we start by creating a mapping from the CSV entity [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) to the database table 
 [region](./src/main/resources/database/mysql/region.tbl).
