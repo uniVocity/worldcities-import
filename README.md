@@ -7,10 +7,10 @@ We will be using a couple of files made available for free by [Maxmind](http://w
 The size of this file can present some problems, especially if you need to load the data into a different database schema. Additionally, there are inconsistencies, such as incomplete data and duplicate cities, which we will try to address.
 
 We created two examples for you:
+ * [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) - migrates both the [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) and  [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) files into the database tables [region](./src/main/resources/database/mysql/region.tbl) and [city](./src/main/resources/database/mysql/city.tbl). We will use uniVocity to manage the keys generated upon insertion of each `region` record, and create `city` records with consistent foreign key values in the `region_id` column. In this process we will also discard duplicate cities, and cities that are not associated with any region.
 
- * [LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) - loads the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file into the database table [worldcities](./src/main/resources/database/mysql/worldcities.tbl). 
+ * [LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java) - loads the [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) file into the database table [worldcities](./src/main/resources/database/mysql/worldcities.tbl). This is just a simple copy with no special transformations involved.
  
- * [MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java) - migrates the [region_codes.csv](http://geolite.maxmind.com/download/geoip/misc/region_codes.csv) file to the database table [region](./src/main/resources/database/mysql/region.tbl). We will use uniVocity to manage the keys generated upon insertion of each record, and then migrate data from [worldcitiespop.txt](http://www.maxmind.com/download/worldcities/worldcitiespop.txt.gz) to the [city](./src/main/resources/database/mysql/city.tbl) table. The  [city](./src/main/resources/database/mysql/city.tbl) table has a foreign key referencing [region](./src/main/resources/database/mysql/region.tbl). In this process we will discard duplicate cities, and cities that are not associated with any region.
 
 ## What to expect
 
@@ -26,10 +26,10 @@ These are the statistics I got after processing 3,173,958 rows:
 
 | Process           |   Time to complete | Rows inserted | Memory | Throughput | License |
 |-------------------|-------------------:|--------------:|-------:|-----------:|---------|
-|[LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java)|	64.094 seconds | 3,173,958 | 300 MB | 49,520.4 rows/s  | Evaluation |
-|[LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java)|	8.069 minutes |	3,173,958 | 300 MB | 6,555.5 rows/s.  |	Free |
 |[MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)|61.835 seconds | 3,032,002 | 3 GB |51,269.3 rows/s  | Evaluation |
 |[MigrateWorldCities.java] (./src/main/java/com/univocity/articles/importcities/MigrateWorldCities.java)|11.717 minutes	| 3,032,002 | 3 GB |4,509.3 rows/s  | Free |
+|[LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java)|	64.094 seconds | 3,173,958 | 300 MB | 49,520.4 rows/s  | Evaluation |
+|[LoadWorldCities.java] (./src/main/java/com/univocity/articles/importcities/LoadWorldCities.java)|	8.069 minutes |	3,173,958 | 300 MB | 6,555.5 rows/s.  |	Free |
  
 Notice that uniVocity is free for non-commercial use, but in this case batch operations are disabled. Nevertheless, the performance is not too bad considering the amount of data we are inserting without batching. We are constantly working to improve uniVocity's performance even further.
 
